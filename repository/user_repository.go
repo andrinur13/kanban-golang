@@ -9,6 +9,7 @@ import (
 type UserRepository interface {
 	Save(input entity.User) (entity.User, error)
 	CheckSameEmail(email string) (entity.User, error)
+	GetByEmail(email string) (entity.User, error)
 }
 
 type userRepository struct {
@@ -39,4 +40,16 @@ func (r *userRepository) CheckSameEmail(email string) (entity.User, error) {
 	}
 
 	return userSame, nil
+}
+
+func (r *userRepository) GetByEmail(email string) (entity.User, error) {
+	userResult := entity.User{}
+
+	err := r.db.Where("email = ?", email).Find(&userResult).Error
+
+	if err != nil {
+		return entity.User{}, err
+	}
+
+	return userResult, nil
 }

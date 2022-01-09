@@ -11,6 +11,7 @@ import (
 
 type UserService interface {
 	CreateUser(userInput input.RegisterUserInput) (entity.User, error)
+	GetUserByEmail(email string) (entity.User, error)
 }
 
 type userService struct {
@@ -52,4 +53,14 @@ func (s *userService) CreateUser(input input.RegisterUserInput) (entity.User, er
 	}
 
 	return createdUser, nil
+}
+
+func (s *userService) GetUserByEmail(email string) (entity.User, error) {
+	userResult, err := s.userRepository.GetByEmail(email)
+
+	if err != nil {
+		return entity.User{}, err
+	}
+
+	return userResult, nil
 }

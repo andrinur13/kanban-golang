@@ -31,7 +31,9 @@ func main() {
 
 	router := gin.Default()
 
+	// routing
 	router.POST("/register", userController.RegisterUser)
+	router.POST("/login", userController.Login)
 
 	router.Run()
 
