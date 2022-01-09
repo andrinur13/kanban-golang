@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"kanban-golang/conf"
 	"kanban-golang/controller"
+	"kanban-golang/middleware"
 	"kanban-golang/service"
 
 	"github.com/gin-gonic/gin"
@@ -34,8 +35,8 @@ func main() {
 	// routing
 	router.POST("/register", userController.RegisterUser)
 	router.POST("/login", userController.Login)
+	router.PUT("/update-account", middleware.AuthMiddleware(), userController.UpdateUser)
 
 	router.Run()
 
-	fmt.Println("hello world!")
 }

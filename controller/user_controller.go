@@ -120,3 +120,52 @@ func (h *userController) Login(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 	return
 }
+
+func (h *userController) UpdateUser(c *gin.Context) {
+	currentUser := c.MustGet("currentUser").(int)
+
+	var inputUserUpdate input.UpdateUserInput
+
+	err := c.ShouldBindJSON(&inputUserUpdate)
+
+	if err != nil {
+		// errorMessages := helper.FormatValidationError(err)
+		response := helper.APIResponse("failed", gin.H{
+			"errors": err.Error(),
+		})
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	_, err = h.userService.UpdateUser(currentUser, inputUserUpdate)
+
+	if err != nil {
+		// errorMessages := helper.FormatValidationError(err)
+		response := helper.APIResponse("failed", gin.H{
+			"errors": err.Error(),
+		})
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	userUpdated, err := h.userService.GetUserByID(currentUser)
+
+	if err != nil {
+		response := helper.APIResponse("failed", gin.H{
+			"errors": err.Error(),
+		})
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	userResponse := response.UserUpdateResponse{
+		ID:        userUpdated.ID,
+		FullName:  userUpdated.FullName,
+		Email:     userUpdated.Email,
+		UpdatedAt: userUpdated.UpdatedAt,
+	}
+
+	response := helper.APIResponse("ok", userResponse)
+	c.JSON(http.StatusOK, response)
+	return
+}

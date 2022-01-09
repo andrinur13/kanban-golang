@@ -30,14 +30,14 @@ func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
 	return
 }
 
-func (u *User) BeforeUpdate(tx *gorm.DB) (err error) {
-	_, errCreate := govalidator.ValidateStruct(u)
+// func (u *User) BeforeUpdate(tx *gorm.DB) (err error) {
+// 	_, errCreate := govalidator.ValidateStruct(u)
 
-	if errCreate != nil {
-		err = errCreate
-		return
-	}
+// 	if errCreate != nil {
+// 		err = errCreate
+// 		return
+// 	}
 
-	err = nil
-	return
-}
+// 	err = nil
+// 	return
+// }

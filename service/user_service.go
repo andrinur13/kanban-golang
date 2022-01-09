@@ -12,6 +12,8 @@ import (
 type UserService interface {
 	CreateUser(userInput input.RegisterUserInput) (entity.User, error)
 	GetUserByEmail(email string) (entity.User, error)
+	UpdateUser(ID int, input input.UpdateUserInput) (entity.User, error)
+	GetUserByID(ID int) (entity.User, error)
 }
 
 type userService struct {
@@ -63,4 +65,43 @@ func (s *userService) GetUserByEmail(email string) (entity.User, error) {
 	}
 
 	return userResult, nil
+}
+
+func (s *userService) GetUserByID(ID int) (entity.User, error) {
+	user, err := s.userRepository.GetByID(ID)
+
+	if err != nil {
+		return user, err
+	}
+
+	if user.ID == 0 {
+		return entity.User{}, nil
+	}
+
+	return user, nil
+}
+
+func (s *userService) UpdateUser(ID int, input input.UpdateUserInput) (entity.User, error) {
+	userResult, err := s.userRepository.GetByID(ID)
+
+	if err != nil {
+		return entity.User{}, err
+	}
+
+	if userResult.ID == 0 {
+		return entity.User{}, errors.New("user not found!")
+	}
+
+	updatedUser := entity.User{
+		FullName: input.FullName,
+		Email:    input.Email,
+	}
+
+	userUpdate, err := s.userRepository.Update(ID, updatedUser)
+
+	if err != nil {
+		return userUpdate, err
+	}
+
+	return userUpdate, nil
 }

@@ -10,6 +10,8 @@ type UserRepository interface {
 	Save(input entity.User) (entity.User, error)
 	CheckSameEmail(email string) (entity.User, error)
 	GetByEmail(email string) (entity.User, error)
+	GetByID(ID int) (entity.User, error)
+	Update(ID int, user entity.User) (entity.User, error)
 }
 
 type userRepository struct {
@@ -52,4 +54,26 @@ func (r *userRepository) GetByEmail(email string) (entity.User, error) {
 	}
 
 	return userResult, nil
+}
+
+func (r *userRepository) GetByID(ID int) (entity.User, error) {
+	userResult := entity.User{}
+
+	err := r.db.Where("id = ?", ID).Find(&userResult).Error
+
+	if err != nil {
+		return entity.User{}, err
+	}
+
+	return userResult, nil
+}
+
+func (r *userRepository) Update(ID int, user entity.User) (entity.User, error) {
+	err := r.db.Where("id = ?", ID).Updates(&user).Error
+
+	if err != nil {
+		return entity.User{}, err
+	}
+
+	return user, nil
 }
