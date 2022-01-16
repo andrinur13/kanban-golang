@@ -11,6 +11,7 @@ type TaskService interface {
 	GetTasks(ID int) ([]entity.Task, error)
 	UpdateTask(ID int, editTask input.TaskEditInput) (entity.Task, error)
 	UpdateStatusTask(ID int, statusTask input.TaskUpdateStatus) (entity.Task, error)
+	DeleteTask(ID int) (bool, error)
 }
 
 type taskService struct {
@@ -74,4 +75,14 @@ func (s *taskService) UpdateStatusTask(ID int, statusTask input.TaskUpdateStatus
 	}
 
 	return taskUpdatedStatus, nil
+}
+
+func (s *taskService) DeleteTask(ID int) (bool, error) {
+	deletedTask, err := s.taskRepository.Delete(ID)
+
+	if err != nil {
+		return deletedTask, err
+	}
+
+	return deletedTask, nil
 }

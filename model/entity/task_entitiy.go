@@ -19,6 +19,10 @@ type Task struct {
 	DeletedAt   time.Time `json:"deleted_at"`
 }
 
+func (Task) TableName() string {
+	return "task"
+}
+
 func (t *Task) BeforeCreate(tx *gorm.DB) (err error) {
 	_, errCreate := govalidator.ValidateStruct(t)
 
