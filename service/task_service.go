@@ -7,8 +7,9 @@ import (
 )
 
 type TaskService interface {
-	CreateTask(input input.TaskCreateInput) (entity.Task, error)
+	CreateTask(input input.TaskCreateInput, IDUser int) (entity.Task, error)
 	GetTasks(ID int) ([]entity.Task, error)
+	GetTaskDetail(ID int) (entity.Task, error)
 	UpdateTask(ID int, editTask input.TaskEditInput) (entity.Task, error)
 	UpdateStatusTask(ID int, statusTask input.TaskUpdateStatus) (entity.Task, error)
 	DeleteTask(ID int) (bool, error)
@@ -22,11 +23,13 @@ func NewTaskService(taskRepository repository.TaskRepository) *taskService {
 	return &taskService{taskRepository}
 }
 
-func (s *taskService) CreateTask(input input.TaskCreateInput) (entity.Task, error) {
+func (s *taskService) CreateTask(input input.TaskCreateInput, IDUser int) (entity.Task, error) {
 	newTask := entity.Task{
 		Description: input.Description,
 		Title:       input.Title,
 		CategoryID:  input.CategoryID,
+		UserID:      IDUser,
+		Status:      false,
 	}
 
 	createdTask, err := s.taskRepository.Save(newTask)
@@ -46,6 +49,16 @@ func (s *taskService) GetTasks(ID int) ([]entity.Task, error) {
 	}
 
 	return tasks, nil
+}
+
+func (s *taskService) GetTaskDetail(ID int) (entity.Task, error) {
+	task, err := s.taskRepository.GetDetail(ID)
+
+	if err != nil {
+		return task, err
+	}
+
+	return task, nil
 }
 
 func (s *taskService) UpdateTask(ID int, editTask input.TaskEditInput) (entity.Task, error) {

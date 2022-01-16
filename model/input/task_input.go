@@ -14,3 +14,7 @@ type TaskEditInput struct {
 type TaskUpdateStatus struct {
 	Status bool `json:"status"`
 }
+
+type TaskID struct {
+	ID int `uri:"id"`
+}
