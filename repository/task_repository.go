@@ -2,16 +2,16 @@ package repository
 
 import (
 	"kanban-golang/model/entity"
-	"kanban-golang/model/input"
 
 	"gorm.io/gorm"
 )
 
-type TypeRepository interface {
+type TaskRepository interface {
 	Save(task entity.Task) (entity.Task, error)
 	Get(IDUser int) ([]entity.Task, error)
-	Update(ID int, taskEdit input.TaskEditInput) (entity.Task, error)
+	Update(ID int, taskEdit entity.Task) (entity.Task, error)
 	SwitchStatus(ID int, status bool) (entity.Task, error)
+	Delete(ID int) (bool, error)
 }
 
 type taskRepository struct {
@@ -45,7 +45,7 @@ func (r *taskRepository) Get(IDUser int) ([]entity.Task, error) {
 
 }
 
-func (r *taskRepository) Update(ID int, taskEdit input.TaskEditInput) (entity.Task, error) {
+func (r *taskRepository) Update(ID int, taskEdit entity.Task) (entity.Task, error) {
 	err := r.db.Where("id = ?", ID).Updates(taskEdit).Error
 
 	if err != nil {
@@ -77,4 +77,19 @@ func (r *taskRepository) SwitchStatus(ID int, status bool) (entity.Task, error) 
 	}
 
 	return taskSwitched, nil
+}
+
+func (r *taskRepository) Delete(ID int) (bool, error) {
+
+	taskDeleted := entity.Task{
+		ID: ID,
+	}
+
+	err := r.db.Where("id = ?", ID).Delete(&taskDeleted).Error
+
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
 }
