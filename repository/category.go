@@ -12,6 +12,7 @@ type CategoryRepository interface {
 	GetByID(ID int) (entity.Category, error)
 	Update(ID int, category entity.Category) (entity.Category, error)
 	Delete(ID int) (entity.Category, error)
+	GetByIDUser(ID int) ([]entity.Category, error)
 }
 
 type categoryRepository struct {
@@ -45,15 +46,27 @@ func (r *categoryRepository) CheckType(tipe string) (entity.Category, error) {
 }
 
 func (r *categoryRepository) GetByID(ID int) (entity.Category, error) {
-	userResult := entity.Category{}
+	categoryResult := entity.Category{}
 
-	err := r.db.Where("id = ?", ID).Find(&userResult).Error
+	err := r.db.Where("id = ?", ID).Find(&categoryResult).Error
 
 	if err != nil {
 		return entity.Category{}, err
 	}
 
-	return userResult, nil
+	return categoryResult, nil
+}
+
+func (r *categoryRepository) GetByIDUser(ID int) ([]entity.Category, error) {
+	categoryResult := []entity.Category{}
+
+	err := r.db.Where("user_id = ?", ID).Error
+
+	if err != nil {
+		return categoryResult, err
+	}
+
+	return categoryResult, nil
 }
 
 func (r *categoryRepository) Update(ID int, category entity.Category) (entity.Category, error) {

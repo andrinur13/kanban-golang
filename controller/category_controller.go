@@ -12,10 +12,11 @@ import (
 
 type categoryController struct {
 	categoryService service.CategoryService
+	userService     service.UserService
 }
 
-func NewCategoryController(categoryService service.CategoryService) *categoryController {
-	return &categoryController{categoryService}
+func NewCategoryController(categoryService service.CategoryService, userService service.UserService) *categoryController {
+	return &categoryController{categoryService, userService}
 }
 
 func (h *categoryController) CreateCategory(c *gin.Context) {
@@ -24,13 +25,20 @@ func (h *categoryController) CreateCategory(c *gin.Context) {
 	err := c.ShouldBindJSON(&input)
 
 	if err != nil {
-		error_message := gin.H{
-			"error": helper.FormatValidationError(err),
-		}
 
-		resp := helper.APIResponse("error", error_message)
+		resp := helper.APIResponse("error", err.Error())
 
 		c.JSON(http.StatusBadRequest, resp)
+		return
+	}
+
+	currentUser := c.MustGet("currentUser").(int)
+
+	userResult, err := h.userService.GetUserByID(currentUser)
+
+	if userResult.Role != "admin" {
+		resp := helper.APIResponse("error", "Unauthorized User!")
+		c.JSON(http.StatusUnauthorized, resp)
 		return
 	}
 
@@ -148,11 +156,11 @@ func (h *categoryController) GetAllCategory(c *gin.Context) {
 
 	currentUser := c.MustGet("currentUser").(int)
 
-	allCategory, err := h.categoryService.GetCategoryByID(currentUser)
+	allCategory, err := h.categoryService.GetCategoryByIDUser(currentUser)
 
 	if err != nil {
 		error_message := gin.H{
-			"error": helper.FormatValidationError(err),
+			"error": err.Error(),
 		}
 
 		resp := helper.APIResponse("error", error_message)

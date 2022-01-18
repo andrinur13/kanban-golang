@@ -24,14 +24,17 @@ func main() {
 	// repository
 	userRepository := repository.NewUserRepository(db)
 	taskRepository := repository.NewTaskRepository(db)
+	categoryRepository := repository.NewCategoryRepository(db)
 
 	// service
 	userService := service.NewUserService(userRepository)
 	taskService := service.NewTaskService(taskRepository)
+	categoryService := service.NewCategoryService(categoryRepository)
 
 	// controller
 	userController := controller.NewUserController(userService)
 	taskController := controller.NewTaskController(taskService)
+	categoryController := controller.NewCategoryController(categoryService, userService)
 
 	router := gin.Default()
 
@@ -48,6 +51,12 @@ func main() {
 	router.PUT("/tasks/:id", middleware.AuthMiddleware(), taskController.UpdateTask)
 	router.PATCH("/tasks/update-status/:id", middleware.AuthMiddleware(), taskController.UpdateStatusTask)
 	router.DELETE("/tasks/:id", middleware.AuthMiddleware(), taskController.DeleteTask)
+
+	// category
+	router.POST("/categories", middleware.AuthMiddleware(), categoryController.CreateCategory)
+	router.GET("/categories", middleware.AuthMiddleware(), categoryController.GetAllCategory)
+	router.PATCH("/categories", middleware.AuthMiddleware(), categoryController.UpdateCategory)
+	router.DELETE("/categories", middleware.AuthMiddleware(), categoryController.DeleteCategory)
 
 	// taskSwithced := true
 	// a, b := taskRepository.SwitchStatus(3, taskSwithced)
