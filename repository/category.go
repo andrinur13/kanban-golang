@@ -12,7 +12,7 @@ type CategoryRepository interface {
 	GetByID(ID int) (entity.Category, error)
 	Update(ID int, category entity.Category) (entity.Category, error)
 	Delete(ID int) (entity.Category, error)
-	GetByIDUser(ID int) ([]entity.Category, error)
+	GetCategory() ([]entity.Category, error)
 }
 
 type categoryRepository struct {
@@ -57,10 +57,10 @@ func (r *categoryRepository) GetByID(ID int) (entity.Category, error) {
 	return categoryResult, nil
 }
 
-func (r *categoryRepository) GetByIDUser(ID int) ([]entity.Category, error) {
+func (r *categoryRepository) GetCategory() ([]entity.Category, error) {
 	categoryResult := []entity.Category{}
 
-	err := r.db.Where("user_id = ?", ID).Error
+	err := r.db.Find(&categoryResult).Error
 
 	if err != nil {
 		return categoryResult, err

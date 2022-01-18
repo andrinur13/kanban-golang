@@ -154,9 +154,7 @@ func (h *categoryController) DeleteCategory(c *gin.Context) {
 
 func (h *categoryController) GetAllCategory(c *gin.Context) {
 
-	currentUser := c.MustGet("currentUser").(int)
-
-	allCategory, err := h.categoryService.GetCategoryByIDUser(currentUser)
+	allCategory, err := h.categoryService.GetCategory()
 
 	if err != nil {
 		error_message := gin.H{

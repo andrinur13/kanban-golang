@@ -12,7 +12,7 @@ type CategoryService interface {
 	GetCategoryByID(ID int) (entity.Category, error)
 	UpdateCategory(ID int, input input.UpdateCategory) (entity.Category, error)
 	DeleteCategory(ID int) (entity.Category, error)
-	GetCategoryByIDUser(ID int) ([]entity.Category, error)
+	GetCategory() ([]entity.Category, error)
 }
 
 type categoryService struct {
@@ -46,8 +46,8 @@ func (s *categoryService) GetCategoryByID(ID int) (entity.Category, error) {
 	return category, nil
 }
 
-func (s *categoryService) GetCategoryByIDUser(ID int) ([]entity.Category, error) {
-	category, err := s.categoryRepository.GetByIDUser(ID)
+func (s *categoryService) GetCategory() ([]entity.Category, error) {
+	category, err := s.categoryRepository.GetCategory()
 
 	if err != nil {
 		return category, err
