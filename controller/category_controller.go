@@ -1,0 +1,165 @@
+package controller
+
+import (
+	"kanban-golang/helper"
+	"kanban-golang/model/input"
+	"kanban-golang/model/response"
+	"kanban-golang/service"
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+)
+
+type categoryController struct {
+	categoryService service.CategoryService
+}
+
+func NewCategoryController(categoryService service.CategoryService) *categoryController {
+	return &categoryController{categoryService}
+}
+
+func (h *categoryController) CreateCategory(c *gin.Context) {
+	var input input.CreateCategory
+
+	err := c.ShouldBindJSON(&input)
+
+	if err != nil {
+		error_message := gin.H{
+			"error": helper.FormatValidationError(err),
+		}
+
+		resp := helper.APIResponse("error", error_message)
+
+		c.JSON(http.StatusBadRequest, resp)
+		return
+	}
+
+	newCategory, err := h.categoryService.CreateCategory(input)
+
+	if err != nil {
+		error_message := gin.H{
+			"error": err.Error(),
+		}
+
+		resp := helper.APIResponse("error", error_message)
+
+		c.JSON(http.StatusBadRequest, resp)
+		return
+	}
+
+	// success created user
+	Response := response.CreateResponse{
+		ID:        newCategory.ID,
+		Type:      newCategory.Type,
+		CreatedAt: newCategory.CreatedAt,
+	}
+
+	resp := helper.APIResponse("success", Response)
+	c.JSON(http.StatusCreated, resp)
+
+}
+
+func (h *categoryController) UpdateCategory(c *gin.Context) {
+	currentUser := c.MustGet("currentUser").(int)
+
+	var inputUpdate input.UpdateCategory
+
+	err := c.ShouldBindJSON(&inputUpdate)
+
+	if err != nil {
+		// errorMessages := helper.FormatValidationError(err)
+		response := helper.APIResponse("failed", gin.H{
+			"errors": err.Error(),
+		})
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	_, err = h.categoryService.UpdateCategory(currentUser, inputUpdate)
+
+	if err != nil {
+		// errorMessages := helper.FormatValidationError(err)
+		response := helper.APIResponse("failed", gin.H{
+			"errors": err.Error(),
+		})
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	categoryUpdated, err := h.categoryService.GetCategoryByID(currentUser)
+
+	if err != nil {
+		response := helper.APIResponse("failed", gin.H{
+			"errors": err.Error(),
+		})
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	userResponse := response.UpdateResponse{
+		ID:        categoryUpdated.ID,
+		Type:      categoryUpdated.Type,
+		UpdatedAt: categoryUpdated.UpdatedAt,
+	}
+
+	response := helper.APIResponse("ok", userResponse)
+	c.JSON(http.StatusOK, response)
+	return
+}
+
+func (h *categoryController) DeleteCategory(c *gin.Context) {
+
+	currentUser := c.MustGet("currentUser").(int)
+
+	if currentUser == 0 {
+		response := helper.APIResponse("failed", "unauthorized user")
+		c.JSON(http.StatusUnauthorized, response)
+		return
+	}
+
+	var Deleted input.DeleteCategory
+	err := c.ShouldBindUri(&Deleted)
+
+	if err != nil {
+		response := helper.APIResponse("failed", gin.H{
+			"errors": err.Error(),
+		})
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	_, err = h.categoryService.DeleteCategory(Deleted.ID)
+
+	if err != nil {
+		response := helper.APIResponse("failed", gin.H{
+			"errors": err.Error(),
+		})
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	message := "Category deleted"
+
+	response := helper.APIResponse("ok", message)
+	c.JSON(http.StatusOK, response)
+}
+
+func (h *categoryController) GetAllCategory(c *gin.Context) {
+
+	currentUser := c.MustGet("currentUser").(int)
+
+	allCategory, err := h.categoryService.GetCategoryByID(currentUser)
+
+	if err != nil {
+		error_message := gin.H{
+			"error": helper.FormatValidationError(err),
+		}
+
+		resp := helper.APIResponse("error", error_message)
+		c.JSON(http.StatusBadRequest, resp)
+		return
+	}
+
+	resp := helper.APIResponse("success", allCategory)
+	c.JSON(http.StatusOK, resp)
+}
