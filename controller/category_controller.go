@@ -75,11 +75,18 @@ func (h *categoryController) UpdateCategory(c *gin.Context) {
 	err := c.ShouldBindJSON(&inputUpdate)
 
 	if err != nil {
-		// errorMessages := helper.FormatValidationError(err)
 		response := helper.APIResponse("failed", gin.H{
 			"errors": err.Error(),
 		})
 		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	userResult, err := h.userService.GetUserByID(currentUser)
+
+	if userResult.Role != "admin" {
+		resp := helper.APIResponse("error", "Unauthorized User!")
+		c.JSON(http.StatusUnauthorized, resp)
 		return
 	}
 
@@ -133,6 +140,14 @@ func (h *categoryController) DeleteCategory(c *gin.Context) {
 			"errors": err.Error(),
 		})
 		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	userResult, err := h.userService.GetUserByID(currentUser)
+
+	if userResult.Role != "admin" {
+		resp := helper.APIResponse("error", "Unauthorized User!")
+		c.JSON(http.StatusUnauthorized, resp)
 		return
 	}
 

@@ -55,8 +55,8 @@ func main() {
 	// category
 	router.POST("/categories", middleware.AuthMiddleware(), categoryController.CreateCategory)
 	router.GET("/categories", middleware.AuthMiddleware(), categoryController.GetAllCategory)
-	router.PATCH("/categories", middleware.AuthMiddleware(), categoryController.UpdateCategory)
-	router.DELETE("/categories", middleware.AuthMiddleware(), categoryController.DeleteCategory)
+	router.PATCH("/categories/:id", middleware.AuthMiddleware(), categoryController.UpdateCategory)
+	router.DELETE("/categories/:id", middleware.AuthMiddleware(), categoryController.DeleteCategory)
 
 	// taskSwithced := true
 	// a, b := taskRepository.SwitchStatus(3, taskSwithced)
