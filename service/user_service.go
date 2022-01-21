@@ -14,6 +14,7 @@ type UserService interface {
 	GetUserByEmail(email string) (entity.User, error)
 	UpdateUser(ID int, input input.UpdateUserInput) (entity.User, error)
 	GetUserByID(ID int) (entity.User, error)
+	DeleteUser(ID int) (entity.User, error)
 }
 
 type userService struct {
@@ -104,4 +105,26 @@ func (s *userService) UpdateUser(ID int, input input.UpdateUserInput) (entity.Us
 	}
 
 	return userUpdate, nil
+}
+
+func (s *userService) DeleteUser(ID int) (entity.User, error) {
+
+	userdata, err := s.GetUserByID(ID)
+
+	if err != nil {
+		return entity.User{}, err
+	}
+
+	if userdata.Role == "admin" {
+		return entity.User{}, errors.New("Admin can not destroy self!")
+	}
+
+	_, err = s.userRepository.Delete(ID)
+
+	if err != nil {
+		return entity.User{}, err
+	}
+
+	return entity.User{}, nil
+
 }

@@ -44,6 +44,7 @@ func main() {
 	router.POST("/register", userController.RegisterUser)
 	router.POST("/login", userController.Login)
 	router.PUT("/update-account", middleware.AuthMiddleware(), userController.UpdateUser)
+	router.DELETE("/delete-account", middleware.AuthMiddleware(), userController.DeleteUser)
 
 	// task
 	router.POST("/tasks", middleware.AuthMiddleware(), taskController.CreateNewTask)
@@ -58,11 +59,6 @@ func main() {
 	router.GET("/categories", middleware.AuthMiddleware(), categoryController.GetAllCategory)
 	router.PATCH("/categories/:id", middleware.AuthMiddleware(), categoryController.UpdateCategory)
 	router.DELETE("/categories/:id", middleware.AuthMiddleware(), categoryController.DeleteCategory)
-
-	// taskSwithced := true
-	// a, b := taskRepository.SwitchStatus(3, taskSwithced)
-	// fmt.Println(a)
-	// fmt.Println(b)
 
 	router.Run()
 

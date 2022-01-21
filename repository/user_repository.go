@@ -12,6 +12,7 @@ type UserRepository interface {
 	GetByEmail(email string) (entity.User, error)
 	GetByID(ID int) (entity.User, error)
 	Update(ID int, user entity.User) (entity.User, error)
+	Delete(ID int) (bool, error)
 }
 
 type userRepository struct {
@@ -76,4 +77,18 @@ func (r *userRepository) Update(ID int, user entity.User) (entity.User, error) {
 	}
 
 	return user, nil
+}
+
+func (r *userRepository) Delete(ID int) (bool, error) {
+	userDeleted := entity.User{
+		ID: ID,
+	}
+
+	err := r.db.Where("id = ?", ID).Delete(userDeleted).Error
+
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
 }

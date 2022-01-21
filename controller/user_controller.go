@@ -169,3 +169,22 @@ func (h *userController) UpdateUser(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 	return
 }
+
+func (h *userController) DeleteUser(c *gin.Context) {
+	currentUser := c.MustGet("currentUser").(int)
+
+	_, err := h.userService.DeleteUser(currentUser)
+
+	if err != nil {
+		// errorMessages := helper.FormatValidationError(err)
+		response := helper.APIResponse("failed", gin.H{
+			"errors": err.Error(),
+		})
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	response := helper.APIResponse("ok", "Your account has been successfully deleted!")
+	c.JSON(http.StatusOK, response)
+	return
+}
