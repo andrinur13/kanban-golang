@@ -263,6 +263,66 @@ func (h *taskController) UpdateStatusTask(c *gin.Context) {
 
 }
 
+func (h *taskController) UpdateCategoryTask(c *gin.Context) {
+	currentUser := c.MustGet("currentUser").(int)
+
+	var inputCategory input.TaskUpdateCategory
+	var inputID input.TaskID
+
+	err := c.ShouldBindJSON(&inputCategory)
+	err = c.ShouldBindUri(&inputID)
+
+	if err != nil {
+		response := helper.APIResponse("failed", gin.H{
+			"errors": err.Error(),
+		})
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	taskWillEdit, err := h.taskService.GetTaskDetail(inputID.ID)
+
+	if taskWillEdit.ID == 0 {
+		response := helper.APIResponse("failed", gin.H{
+			"errors": "task not found!",
+		})
+		c.JSON(http.StatusNotFound, response)
+		return
+	}
+
+	if taskWillEdit.UserID != currentUser {
+		response := helper.APIResponse("failed", gin.H{
+			"errors": "task not found!",
+		})
+		c.JSON(http.StatusUnauthorized, response)
+		return
+	}
+
+	updatedStatusTask, err := h.taskService.UpdateStatusCategoryTask(inputID.ID, inputCategory)
+
+	if err != nil {
+		response := helper.APIResponse("failed", gin.H{
+			"errors": err.Error(),
+		})
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	taskResponse := response.TaskUpdatedResponse{
+		ID:          updatedStatusTask.ID,
+		Title:       updatedStatusTask.Title,
+		Description: updatedStatusTask.Description,
+		Status:      updatedStatusTask.Status,
+		UserID:      updatedStatusTask.UserID,
+		CategoryID:  updatedStatusTask.CategoryID,
+		UpdatedAt:   updatedStatusTask.UpdatedAt,
+	}
+
+	response := helper.APIResponse("ok", taskResponse)
+	c.JSON(http.StatusOK, response)
+
+}
+
 func (h *taskController) DeleteTask(c *gin.Context) {
 
 	currentUser := c.MustGet("currentUser").(int)

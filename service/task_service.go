@@ -13,6 +13,7 @@ type TaskService interface {
 	UpdateTask(ID int, editTask input.TaskEditInput) (entity.Task, error)
 	UpdateStatusTask(ID int, statusTask input.TaskUpdateStatus) (entity.Task, error)
 	DeleteTask(ID int) (bool, error)
+	UpdateStatusCategoryTask(ID int, statusTask input.TaskUpdateCategory) (entity.Task, error)
 }
 
 type taskService struct {
@@ -88,6 +89,21 @@ func (s *taskService) UpdateStatusTask(ID int, statusTask input.TaskUpdateStatus
 	}
 
 	return taskUpdatedStatus, nil
+}
+
+func (s *taskService) UpdateStatusCategoryTask(ID int, statusTask input.TaskUpdateCategory) (entity.Task, error) {
+	// mapping task
+	newCategoryTask := entity.Task{
+		CategoryID: statusTask.CategoryID,
+	}
+
+	taskUpdated, err := s.taskRepository.Update(ID, newCategoryTask)
+
+	if err != nil {
+		return taskUpdated, err
+	}
+
+	return taskUpdated, nil
 }
 
 func (s *taskService) DeleteTask(ID int) (bool, error) {

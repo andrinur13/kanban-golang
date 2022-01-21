@@ -15,6 +15,10 @@ type TaskUpdateStatus struct {
 	Status bool `json:"status"`
 }
 
+type TaskUpdateCategory struct {
+	CategoryID int `json:"category_id"`
+}
+
 type TaskID struct {
 	ID int `uri:"id"`
 }
