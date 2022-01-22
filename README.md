@@ -8,7 +8,7 @@ Kelompok :
 
 ### List library : 
 - [Gin Gionic](https://github.com/gin-gonic/gin) - Web Framework
-- [Gorm](htts://gorm.io) - GORM
+- [Gorm](https://gorm.io) - GORM
 - [Go Validator](https://github.com/asaskevich/govalidator) - Go Validator
 
 
